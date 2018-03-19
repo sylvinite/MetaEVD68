@@ -1,0 +1,28 @@
+slurm_header:
+    project: microbial
+    name: MIC3108
+    qos: normal
+    trim:
+      cores: 2
+      time: 02:00:00
+    align:
+        cores: 4
+        time: 04:00:00
+    process:
+        cores: 1
+        time: 00:30:00
+
+trim_config:
+    quality: 20
+    max_error_frac: 0.1
+    min_length: 20
+
+mapp_config:
+    max_alignments: 20
+    max_pair_mismatches: 999
+    max_pair_mismatches_fraction: 0.04
+    numThreads: 2
+
+folder_locations:
+    genome_setup: /mnt/hds/proj/cust053/tanja_analysis/meta_EVD68/genomeDir
+
