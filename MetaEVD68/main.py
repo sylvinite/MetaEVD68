@@ -56,24 +56,25 @@ def create(ctx, inputdir, outputdir):
         os.makedirs(outputdir)
     files = sorted(glob.glob(os.path.join(inputdir, "*fastq.gz")))
     #Run CreateJob to make sbatch scripts
-    job = CreateJob(ctx.obj['config'], inputdir, outputdir, files)                        ##in HERE
+    job = CreateJob(ctx.obj['config'], inputdir, outputdir, files, ctx.obj['logger'])                        ##in HERE
     CreateJob.trim_job(job)
     CreateJob.align_job(job)
     CreateJob.post_job(job)
 
 @cli.command()
 @click.argument('outputdir')
-def run(outputdir):
+def run(ctx, outputdir):
 
     """Run the scripts
     """
-    ctx.obj(['logger']).info('Running trimming and filtering script')
+    ctx.obj['logger'].info('Running trim.sh')
     running = subprocess.Popen(['sbatch', os.path.join(outputdir, 'scripts/trim.sh')], stdout=subprocess.PIPE)
     stdoutdata, stderrdata = running.communicate()
     job_num = stdoutdata.strip().split()[-1].decode()
     joblist = []
     joblist.append(job_num)
     for sbatch in ['align.sh', 'process.sh']:
+        ctx.obj['logger'].info('Running %s' %sbatch)
         running = subprocess.Popen(['sbatch', os.path.join(outputdir, sbatch), '--dependency', job_num], stdout=subprocess.PIPE)
         stdoutdata, stderrdata = running.communicate()
         job_num = stdoutdata.strip().split()[-1].decode()

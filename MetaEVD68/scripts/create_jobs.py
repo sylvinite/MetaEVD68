@@ -4,6 +4,7 @@
 import os
 import glob
 import click
+import logging
 from abc import ABCMeta
 
 class JobHelper(object):
@@ -46,7 +47,7 @@ class CreateJob(JobHelper):
     """Creates sbatch jobs for running in slurm
     """
 
-    def __init__(self, config, infolder, outfolder, files):
+    def __init__(self, config, infolder, outfolder, files, logger):
 
         """Return an object with sbatch settings, and sample info initialized"
         """
@@ -55,7 +56,9 @@ class CreateJob(JobHelper):
         self.infolder = infolder
         self.outfolder = outfolder
         self.files = files
+        self.logger = logger
         if not os.path.exists(outfolder + 'scripts'):
+            self.logger.info('Creating sbatch output directory: %s' %(os.path.join(outfolder, 'scripts')))
             os.makedirs(os.path.join(outfolder, 'scripts'))
         file_info = files[0].split('/')[-1].split('_')
         laneinfo = []
@@ -93,6 +96,7 @@ class CreateJob(JobHelper):
             command += commandstart + '{} {}&\n'.format(self.files[i],
                                                         self.files[i+1]
                                                         )
+        self.logger.info('Creating sbatch for trimming and filtering: trim.sh')
         JobHelper.create_sbatch(self, head, command, 'trim.sh')
 
     def align_job(self):
@@ -105,6 +109,7 @@ class CreateJob(JobHelper):
                                                                                                      os.path.join(self.outfolder, "STAR.%s." % i),
                                                                                                      os.path.join(self.outfolder, 'tmp%s' %i)
                                                                                                      )
+        self.logger.info('Creating sbatch for aligning reads with STAR aligner: align.sh)
         JobHelper.create_sbatch(self, head, command, 'align.sh')
 
     def post_job(self):
@@ -140,6 +145,7 @@ class CreateJob(JobHelper):
         command += 'samtools index {} {}\nwait\n'.format(os.path.join(self.outfolder, 'dedup.bam'),
                                                          os.path.join(self.outfolder, 'dedup.bam.bai')
                                                          )
+        self.logger.info('Creating sbatch for sorting, adding read groups, merging, removing duplicates and indexing: process.sh')
         JobHelper.create_sbatch(self, head, command, 'process.sh')
 
     def variants(self):
