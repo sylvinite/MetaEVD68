@@ -79,6 +79,7 @@ class CreateJob(JobHelper):
         for i in range(1, int(len(files)/2) + 1):
             alignfiles.append(os.path.join(outfolder, 'STAR_{}.Aligned.out.bam'.format(i)))
         self.alignfiles = alignfiles
+        self.postfile = os.path.join(self.outfile, '{}_{}_{}_{}_final.bam'.format(self.date, self.flowcell, self.sample, self.index))
 
     def trim_job(self):
 
@@ -109,7 +110,7 @@ class CreateJob(JobHelper):
                                                                                                      os.path.join(self.outfolder, "STAR.%s." % i),
                                                                                                      os.path.join(self.outfolder, 'tmp%s' %i)
                                                                                                      )
-        self.logger.info('Creating sbatch for aligning reads with STAR aligner: align.sh)
+        self.logger.info('Creating sbatch for aligning reads with STAR aligner: align.sh')
         JobHelper.create_sbatch(self, head, command, 'align.sh')
 
     def post_job(self):
@@ -139,17 +140,24 @@ class CreateJob(JobHelper):
             workingfile = os.path.join(self.outfolder, 'RG0.bam')
 
         command += 'picard MarkDuplicates I={} O={} M={} REMOVE_DUPLICATES=true\nwait\n'.format(workingfile,
-                                                                                                os.path.join(self.outfolder,'dedup.bam'),
-                                                                                                os.path.join(self.outfolder,'dedup.metrics.txt')
+                                                                                                self.postfile,
+                                                                                                os.path.join(self.outfile, '{}.{}.{}.{}.final.dedup.metrics.txt'.format(self.date, self.flowcell, self.sample, self.index))
                                                                                                 )
-        command += 'samtools index {} {}\nwait\n'.format(os.path.join(self.outfolder, 'dedup.bam'),
-                                                         os.path.join(self.outfolder, 'dedup.bam.bai')
+        command += 'samtools index {} {}\nwait\n'.format(self.postfile,
+                                                         self.postfile + '.bai'
                                                          )
         self.logger.info('Creating sbatch for sorting, adding read groups, merging, removing duplicates and indexing: process.sh')
         JobHelper.create_sbatch(self, head, command, 'process.sh')
 
     def variants(self):
-        pass
+        ######TESTING#########
+        self.postfile = '/Users/tanjanormark/Documents/EVD68/rastaAnalysis/Q-A/merged.Aligned.RG.dedup.bam'
+        self.tsv = os.path.join(outfolder, self.postfile[:-3], 'bam-readcount.tsv')
+
+        command = ''
+        command += 'bam-readcount --max-warnings 1 --min-base-quality 0 -f {} {} > {}.bam-readcount.tsv'.format(self.config['folder_locations']['ref_fasta'], self.postfile, self.tsv)
+        #more variants here
+
 
     def create_jobs(self, head, command):
         pass

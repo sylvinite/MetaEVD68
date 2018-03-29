@@ -25,4 +25,5 @@ mapp_config:
 
 folder_locations:
     genome_setup: /mnt/hds/proj/cust053/tanja_analysis/meta_EVD68/genomeDir
-
+    #ref_fasta: /mnt/hds/proj/cust053/tanja_analysis/meta_EVD68/viralGenome/EVD68.fasta
+    ref_fasta: /Users/tanjanormark/Documents/EVD68/EVD68.fasta
