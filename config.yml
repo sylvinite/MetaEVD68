@@ -3,14 +3,21 @@ slurm_header:
     name: MIC3108
     qos: normal
     trim:
-      cores: 2
-      time: 02:00:00
+      type: core
+      number: 2
+      time: 02:20:00
     align:
-        cores: 4
+        type: core
+        number: 4
         time: 04:00:00
     process:
-        cores: 1
-        time: 00:30:00
+        type: core
+        number: 1
+        time: 01:00:00
+    kraken:
+        type: node
+        number: 1
+        time: 04:00:00
 
 trim_config:
     quality: 20
@@ -22,6 +29,9 @@ mapp_config:
     max_pair_mismatches: 999
     max_pair_mismatches_fraction: 0.04
     numThreads: 2
+
+kraken_config:
+    db_loc: mnt/hds/proj/cust053/tanja_analysis/kraken/databases/db_stndHuman_fin_build
 
 folder_locations:
     genome_setup: /mnt/hds/proj/cust053/tanja_analysis/meta_EVD68/genomeDir

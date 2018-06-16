@@ -8,6 +8,16 @@ setup(
     install_requires= [
         'click',
         'PyYaml',
+        'pylatex',
+        'FastQC',
+        'Trim Galore!',
+        'STAR',
+        'Samtools',
+        'Picard tools',
+        'Bam-readcount',
+        'Bcftools',
+        'Bedtools',
+        'Kraken'
     ],
     entry_points='''
         [console_scripts]
